@@ -1,45 +1,32 @@
-import * as uuid from "uuid";
 import AWS from "aws-sdk";
 import { success, failure } from "./libs/response-lib";
 
 const ses = new AWS.SES({ apiVersion: "2010-12-01" });
 
-export async function main(event, context, callback) {
-  const { message, name, email } = JSON.parse(event.body);
-
-  const invalidRequest =
-    typeof message !== "string" ||
-    typeof name !== "string" ||
-    typeof email !== "string";
-
-  if (invalidRequest) {
-    callback(new Error("Invalid arguments in the event."));
-
-    return;
-  }
+export function main(event, context, callback) {
+  const data = JSON.parse(event.body);
 
   const params = {
     Destination: {
-      ToAddresses: email,
+      ToAddresses: ['donrayxwilliams.gmail.com'],
     },
     Message: {
       Subject: {
         Charset: "UTF-8",
-        Data: `Reaching out from donrayxwilliams.com: ${name}`,
+        Data: `Reaching out from donrayxwilliams.com: ${data.name}`,
       },
       Body: {
         HTML: {
           Charset: "UTF-8",
-          Data: message,
+          Data: data.message,
         },
       },
     },
+    Source: data.email
   };
 
-  try {
-    let data = await ses.sendEmail(params);
-    return success(data);
-  } catch (e) {
-    return failure(e);
-  }
+  ses.sendEmail(params, (err, data) => {
+    if (err) callback(null, failure({ status: false }));
+    else callback(null, success({ status: true }));
+  });
 }

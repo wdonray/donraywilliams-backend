@@ -6,13 +6,14 @@ package:
 plugins:
   - serverless-bundle
   - serverless-offline
-  - serverless-dotenv-plugin
+  # - serverless-dotenv-plugin
 
 provider:
   name: aws
   runtime: nodejs12.x
   stage: prod
   region: us-east-1
+
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -22,7 +23,7 @@ provider:
 
 functions:
   sendEmail:
-    handler: handler.sendEmail
+    handler: sendEmail.main
     events:
       - http:
           path: sendEmail
