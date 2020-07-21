@@ -1,14 +1,14 @@
 import AWS from "aws-sdk";
-import { success, failure } from "./libs/response-lib";
+import handler from "./libs/handler";
 
-const ses = new AWS.SES({ apiVersion: "2010-12-01" });
+const ses = new AWS.SES({ apiVersion: "2010-12-01", region: "us-east-1" });
 
-export function main(event, context, callback) {
+export const main = handler(async (event, context) => {
   const data = JSON.parse(event.body);
 
   const params = {
     Destination: {
-      ToAddresses: ['donrayxwilliams.gmail.com'],
+      ToAddresses: ["donrayxwilliams@gmail.com"],
     },
     Message: {
       Subject: {
@@ -22,11 +22,10 @@ export function main(event, context, callback) {
         },
       },
     },
-    Source: data.email
+    Source: data.email,
   };
 
-  ses.sendEmail(params, (err, data) => {
-    if (err) callback(null, failure({ status: false }));
-    else callback(null, success({ status: true }));
-  });
-}
+  let response = await ses.sendEmail(params);
+
+  return response.httpRequest;
+});
