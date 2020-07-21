@@ -6,26 +6,31 @@ const ses = new AWS.SES({ apiVersion: "2010-12-01", region: "us-east-1" });
 export const main = handler(async (event, context) => {
   const data = JSON.parse(event.body);
 
+  // Source - I am sending and getting the email
+  // Name - The name of the person creating the email
+  // Email - The actual email of the person
+  // Message - The message that the person wants to send me
+
   const params = {
     Destination: {
-      ToAddresses: ["donrayxwilliams@gmail.com"],
+      ToAddresses: [data.sourceEmail],
     },
     Message: {
       Subject: {
         Charset: "UTF-8",
-        Data: `Reaching out from donrayxwilliams.com: ${data.name}`,
+        Data: `From donrayxwilliams.com: ${data.name} / ${data.email}`,
       },
       Body: {
-        HTML: {
+        Html: {
           Charset: "UTF-8",
           Data: data.message,
         },
       },
     },
-    Source: data.email,
+    Source: data.sourceEmail,
   };
 
-  let response = await ses.sendEmail(params);
+  await ses.sendEmail(params).promise();
 
-  return response.httpRequest;
+  return { Email: data.email, Name: data.name };
 });
