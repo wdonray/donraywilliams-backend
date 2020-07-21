@@ -32,5 +32,5 @@ export const main = handler(async (event, context) => {
 
   await ses.sendEmail(params).promise();
 
-  return { Email: data.email, Name: data.name };
+  return data;
 });
